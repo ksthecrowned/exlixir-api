@@ -53,7 +53,7 @@ export class SwipesController {
      * @throws If there was an error making the swipe
      */
     async makeSwipe(
-        @Body() data: MakeSwipeDto,
+        @Body() data: Omit<MakeSwipeDto, "fromUserId">,
         @Res() res: FastifyReply,
         @Req() req: FastifyRequest,
     ) {
@@ -75,28 +75,18 @@ export class SwipesController {
             // check if fromUser exists
             const fromUser = await this.prisma.user.findUnique({
                 where: {
-                    id: data.fromUserId,
+                    id: tokenIsValid.userId,
                 }
             })
             if(!fromUser || !fromUser.isVerified) {
                 return res.status(404).send("The user who swiped doesn't exist or isn't verified");
-            }
-
-            // check if toUser exists
-            const toUser = await this.prisma.user.findUnique({
-                where: {
-                    id: data.toUserId,
-                }
-            })
-            if(!toUser || !toUser.isVerified) {
-                return res.status(404).send("You're trying to swipe someone that doesn't exist or isn't verified");
             }
             
             const errors = await validate(data);
             if (errors.length > 0) {
                 throw new BadRequestException(errors);
             }
-            const response = await this.SwipesService.makeSwipe(data);
+            const response = await this.SwipesService.makeSwipe({ ...data, fromUserId: tokenIsValid.userId});
             if(response.isMatch) {
                 const resp = await this.MatchesSerice.create({
                     user1Id: response.swipe.fromUserId,

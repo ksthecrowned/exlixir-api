@@ -6,7 +6,6 @@ import { SendGridService } from './sendgrid.service';
 import { SwipesModule } from './swipes/swipes.module';
 import { MatchesModule } from './matches/matches.module';
 import { ProfilesModule } from './profiles/profiles.module';
-import { FeedModule } from './feed/feed.module';
 
 @Module({
   imports: [
@@ -14,8 +13,7 @@ import { FeedModule } from './feed/feed.module';
     UsersModule, 
     SwipesModule, 
     MatchesModule,
-    ProfilesModule,
-    FeedModule
+    ProfilesModule
   ],
   controllers: [],
   providers: [PrismaService, SendGridService],

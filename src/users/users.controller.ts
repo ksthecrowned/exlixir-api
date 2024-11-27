@@ -12,6 +12,7 @@ import {
   BadRequestException,
   UseGuards,
   Post,
+  Query,
 } from "@nestjs/common";
 import { UserService } from "./users.service";
 import {
@@ -25,6 +26,7 @@ import { validate } from "class-validator";
 import { AuthGuard } from "src/auth/auth.guard";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { PrismaService } from "src/prisma.service";
+import { Gender, LookingFor, SexualOrientation } from "@prisma/client";
 
 @ApiTags("Users")
 @Controller("users")
@@ -58,16 +60,52 @@ export class UsersController {
   }
   
   @Get()
-  async getAllUsers(@Res() res: FastifyReply, @Req() req: FastifyRequest) {
+  async getAllUsers(
+    @Res() res: FastifyReply, 
+    @Req() req: FastifyRequest,
+    @Query('gender') gender: Gender,
+    @Query('age') age: string,
+    @Query('sexualOrientation') sexualOrientation: SexualOrientation,
+    @Query('lookingFor') lookingFor: LookingFor
+  ) {
     try {
-      const response = await this.userService.getAllUSers();
+      const token = req.headers['authorization'].replace('Bearer ', '');
+      const tokenIsValid = await this.prisma.verificationToken.findFirst({
+          where: {
+              token,
+              expiresAt: {
+                  gt: new Date(),
+              }
+          }
+      })
+      if(!tokenIsValid || !tokenIsValid.userId) {
+          return res.status(401).send('Unauthorized');
+      }
+
+      const userExists = await this.prisma.user.findUnique({
+          where: {
+              id: tokenIsValid.userId,
+              isVerified: true
+          }
+      })
+
+      if(!userExists) {
+          return res.status(400).send({
+              statusCode: 400,
+              message: "User not found or not verified"
+          })
+      }
+
+      const response = await this.userService.getAllUSers(
+        tokenIsValid.userId,
+        gender,
+        parseInt(age),
+        sexualOrientation,
+        lookingFor
+      );
       return res.status(response.statusCode).send(response);
     } catch (error) {
-      logger.error({
-        date: new Date().toLocaleString(),
-        from: req.ip,
-        error,
-      });
+      console.log(error);
       return res.status(500).send({
         statusCode: 500,
         message: "Internal server error",

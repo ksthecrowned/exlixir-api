@@ -11,6 +11,20 @@ export class ProfilesService {
 
     async create(data: CreateProfileDto) {
         try {
+            const existingProfile = await this.prisma.profile.findFirst({
+                where: {
+                    userId: data.userId
+                }
+            })
+
+            if(existingProfile) {
+                return {
+                    statusCode: 400,
+                    profile: existingProfile,
+                    message: "Profile already exists"
+                }
+            }
+
             const profile = await this.prisma.profile.create({
                 data: {
                     ...data,

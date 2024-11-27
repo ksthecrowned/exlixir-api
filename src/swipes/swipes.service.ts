@@ -11,6 +11,24 @@ export class SwipesService {
 
   async makeSwipe(data: MakeSwipeDto) {
     try {
+      // check if toUser exists, is verified and has a profile
+      const toUser = await this.prisma.user.findUnique({
+        where: {
+          id: data.toUserId,
+          isVerified: true,
+          profile: {
+            isNot: null
+          }
+        }
+      })
+
+      if(!toUser || !toUser.isVerified) {
+        return {
+          statusCode: 404,
+          message: "You're trying to swipe someone that doesn't exist or isn't verified or doesn't have a profile!"
+        }
+      }
+
       const prevSwipe = await this.prisma.swipe.findFirst({
         where: {
           fromUserId: data.fromUserId,

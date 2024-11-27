@@ -8,6 +8,7 @@ import { comparePassword, hashPassword, purgeUser } from "utils/utils";
 import { logger } from "utils/logger";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SendGridService } from "src/sendgrid.service";
+import { Gender, LookingFor, SexualOrientation } from "@prisma/client";
 
 /**
  * Service responsible for handling user-related operations.
@@ -51,17 +52,45 @@ export class UserService {
     }
   }
 
-  async getAllUSers() {
+  async getAllUSers(
+    userId: string, 
+    gender?: Gender, 
+    age?: number, 
+    sexualOrientation?: SexualOrientation, 
+    lookingFor?: LookingFor
+  ) {
     try {
+
       const users = await this.prisma.user.findMany({
+        where: {
+          id: { not: userId },
+          AND: [
+            {
+              Swipe: {
+                none: {
+                  fromUserId: userId
+                }
+              }
+            },
+            ...(gender ? [{ profile: { gender } }] : []),
+            ...(age ? [{ profile: { age } }] : []),
+            ...(sexualOrientation
+              ? [{ profile: { sexualOrientation } }]
+              : []),
+            ...(lookingFor
+              ? [{ profile: { lookingFor } }]
+              : [])
+          ]
+        },
         select: {
+          id: true,
           email: true,
           isAdmin: true,
-          id: true,
           isVerified: true,
           profile: true
-        },
-      });
+        }
+      });      
+
       return {
         statusCode: 200,
         users,

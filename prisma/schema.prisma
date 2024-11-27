@@ -13,6 +13,29 @@ enum InterestedIn {
   BOTH
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  NONBINARY
+}
+
+enum SexualOrientation {
+  HETEROSEXUAL
+  HOMOSEXUAL
+  BISEXUAL
+  ASEXUAL
+  OTHER
+}
+
+enum LookingFor {
+  LONG_TERM_PARTNER
+  LONG_TERM_OPEN_TO_SHORT
+  SHORT_TERM_OPEN_TO_LONG
+  SHORT_TERM_FUN
+  NEW_FRIENDS
+  STILL_FIGURING_IT_OUT
+} 
+
 model User {
   id                  String                @id @default(uuid())
   email               String                @unique
@@ -58,10 +81,14 @@ model Profile {
   user                User                  @relation(fields: [userId], references: [id])
   username            String
   bio                 String?
+  birthday            DateTime?             
   age                 Int
-  gender              String
-  interestedIn        InterestedIn
-  location            String
+  gender              Gender                @default(MALE)
+  sexualOrientation   SexualOrientation     @default(HETEROSEXUAL)
+  lookingFor          LookingFor            @default(NEW_FRIENDS)
+  interestedIn        InterestedIn          @default(MALE)
+  latitude            Float?  
+  longitude           Float?
   photos              Photo[]
   createdAt           DateTime              @default(now())
   updatedAt           DateTime?             @default(now())
