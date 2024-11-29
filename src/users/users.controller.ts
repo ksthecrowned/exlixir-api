@@ -66,7 +66,8 @@ export class UsersController {
     @Query('gender') gender: Gender,
     @Query('age') age: string,
     @Query('sexualOrientation') sexualOrientation: SexualOrientation,
-    @Query('lookingFor') lookingFor: LookingFor
+    @Query('lookingFor') lookingFor: LookingFor,
+    @Query('radiusInKm') radiusInKm: number
   ) {
     try {
       const token = req.headers['authorization'].replace('Bearer ', '');
@@ -96,10 +97,11 @@ export class UsersController {
           })
       }
 
-      const response = await this.userService.getAllUSers(
+      const response = await this.userService.getAllUsers(
         tokenIsValid.userId,
+        radiusInKm,
         gender,
-        parseInt(age),
+        age,
         sexualOrientation,
         lookingFor
       );

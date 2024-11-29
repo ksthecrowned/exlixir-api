@@ -53,7 +53,6 @@ model User {
   messages            Message[]             @relation("UserMessages")
 
   Swipe               Swipe[]               @relation("SwipeToUser")
-
   Match               Match[]               @relation("MatchedUsers2")
 }
 

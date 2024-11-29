@@ -119,3 +119,32 @@ export function verifyJwt(token: string): jwt.JwtPayload | null {
 export function decodeJwt(token: string) {
   return jwt.decode(token);
 }
+
+
+/**
+ * Calculates the great-circle distance between two points on the Earth's surface.
+ * @param coord1 - The first coordinate with latitude and longitude properties.
+ * @param coord2 - The second coordinate with latitude and longitude properties.
+ * @returns The distance between the two coordinates in kilometers.
+ */
+export function haversineDistance(coord1, coord2) {
+    const toRad = (value) => (value * Math.PI) / 180;
+    const earthRadius = 6371;
+  
+    const lat1 = coord1.lat;
+    const lon1 = coord1.lon;
+    const lat2 = coord2.lat;
+    const lon2 = coord2.lon;
+  
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+  
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadius * c; // Retourne la distance en km
+  
+    return distance;
+}

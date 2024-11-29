@@ -53,14 +53,29 @@ export class MatchesSerice {
                 },
                 include: {
                     messages: true,
-                    user1: true,
-                    user2: true
+                    user1: {
+                        include: {
+                            profile: true
+                        }
+                    },
+                    user2: {
+                        include: {
+                            profile: true
+                        }
+                    }
                 }
             })
 
             return {
                 statusCode: 200,
-                matches,
+                matches: matches.map(match => {
+                    if (match.user1Id === userId) {
+                        delete match.user1;
+                    } else {
+                        delete match.user2;
+                    }
+                    return match;
+                }),
                 message: "Matches retrieved successfully!"
             }
         } catch (error) {

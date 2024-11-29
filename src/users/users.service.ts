@@ -4,7 +4,7 @@ import {
   UpdateUserPasswordDto,
   UpdateUserProfileDto,
 } from "./dto/update-user.dto";
-import { comparePassword, hashPassword, purgeUser } from "utils/utils";
+import { comparePassword, hashPassword, haversineDistance, purgeUser } from "utils/utils";
 import { logger } from "utils/logger";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SendGridService } from "src/sendgrid.service";
@@ -52,15 +52,33 @@ export class UserService {
     }
   }
 
-  async getAllUSers(
-    userId: string, 
-    gender?: Gender, 
-    age?: number, 
-    sexualOrientation?: SexualOrientation, 
-    lookingFor?: LookingFor
+  async getAllUsers(
+    userId: string,
+    radiusInKm: number,
+    gender?: Gender,
+    age?: string,
+    sexualOrientation?: SexualOrientation,
+    lookingFor?: LookingFor,
   ) {
     try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { profile: { select: { latitude: true, longitude: true } } },
+      });
+  
+      const userLatitude = user?.profile?.latitude;
+      const userLongitude = user?.profile?.longitude;
+  
+      if (!userLatitude || !userLongitude) {
+        return {
+          statusCode: 400,
+          users: [],
+          message: "User location not found.",
+        };
+      }
 
+      const ageRange = age ? age.split("-") : null;
+  
       const users = await this.prisma.user.findMany({
         where: {
           id: { not: userId },
@@ -68,32 +86,48 @@ export class UserService {
             {
               Swipe: {
                 none: {
-                  fromUserId: userId
-                }
-              }
+                  fromUserId: userId,
+                },
+              },
             },
             ...(gender ? [{ profile: { gender } }] : []),
-            ...(age ? [{ profile: { age } }] : []),
-            ...(sexualOrientation
-              ? [{ profile: { sexualOrientation } }]
+            ...(ageRange
+              ? [
+                  {
+                    profile: {
+                      age: {
+                        gte: parseInt(ageRange[0]),
+                        lte: parseInt(ageRange[1]),
+                      },
+                    },
+                  },
+                ]
               : []),
-            ...(lookingFor
-              ? [{ profile: { lookingFor } }]
-              : [])
-          ]
+            ...(sexualOrientation ? [{ profile: { sexualOrientation } }] : []),
+            ...(lookingFor ? [{ profile: { lookingFor } }] : []),
+          ],
         },
         select: {
           id: true,
           email: true,
           isAdmin: true,
           isVerified: true,
-          profile: true
-        }
-      });      
-
+          profile: true,
+        },
+      });
+  
+      // Filtrer avec la distance Haversine pour plus de précision
+      const filteredUsers = users.filter((user) => {
+        const distance = haversineDistance(
+          { lat: userLatitude, lon: userLongitude },
+          { lat: user.profile.latitude, lon: user.profile.longitude }
+        );
+        return distance <= radiusInKm;
+      });
+  
       return {
         statusCode: 200,
-        users,
+        users: filteredUsers,
         message: "Users retrieved successfully",
       };
     } catch (error) {
@@ -101,6 +135,7 @@ export class UserService {
       throw error;
     }
   }
+  
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.prisma.user.create({
