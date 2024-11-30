@@ -6,6 +6,9 @@ import { SendGridService } from './sendgrid.service';
 import { SwipesModule } from './swipes/swipes.module';
 import { MatchesModule } from './matches/matches.module';
 import { ProfilesModule } from './profiles/profiles.module';
+import { MessagesModule } from './messages/messages.module';
+import { RedisService } from './redis.service';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -13,9 +16,11 @@ import { ProfilesModule } from './profiles/profiles.module';
     UsersModule, 
     SwipesModule, 
     MatchesModule,
-    ProfilesModule
+    ProfilesModule,
+    MessagesModule,
+    SubscriptionsModule
   ],
   controllers: [],
-  providers: [PrismaService, SendGridService],
+  providers: [PrismaService, SendGridService, RedisService],
 })
 export class AppModule {}

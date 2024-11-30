@@ -14,10 +14,10 @@
 <a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
 <a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
 <a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+<a href="https://opencollective.com/kaiser-styve" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
   <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+    <a href="https://opencollective.com/kaiser-styve"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://x.com/kaiserstyve" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
 </p>
 
 ## Description
@@ -64,15 +64,9 @@ $ npm run test:cov
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
+Check out a few resources that may come in handy when working with Elixir API:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out official [Jobs board](https://jobs.nestjs.com).
+- Visit the [Mobile APP repo](https://docs.nestjs.com).
 
 ## Support
 
@@ -80,7 +74,7 @@ This project is not open source. If you'd like to support its development, pleas
 
 ## Stay in touch
 
-- Author - [Kaiser Styve](https://twitter.com/kammysliwiec)
+- Author - [Kaiser Styve](https://www.linkedin.com/in/kaiser-styve)
 <!-- - Website - [https://nestjs.com](https://nestjs.com/) -->
 - Twitter - [@kaiserstyve](https://x.com/kaiserstyve)
 - Linkedin - [kaiser-styve](https://www.linkedin.com/in/kaiser-styve)
