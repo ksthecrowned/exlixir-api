@@ -41,6 +41,12 @@ enum SubscriptionType {
   PREMIUM_PLUS     // Premium Plus (30d)
 }
 
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
 model User {
   id                  String                @id @default(uuid())
   email               String                @unique
@@ -53,6 +59,9 @@ model User {
   verificationTokens  VerificationToken[]
 
   profile             Profile?
+  
+  payments            Payment[]
+
   swipes              Swipe[]               @relation("SwipeFromUser")
   matches             Match[]               @relation("MatchedUsers")
   messages            Message[]             @relation("UserMessages")
@@ -129,6 +138,7 @@ model Match {
 model Message {
   id                  String                 @id @default(uuid())
   senderId            String
+  recipientId         String
   matchId             String
   content             String
   sentAt              DateTime               @default(now())
@@ -144,4 +154,17 @@ model Subscription {
   type            SubscriptionType
   expiresAt       DateTime
   createdAt       DateTime        @default(now())
+}
+
+model Payment {
+  id             String           @id @default(uuid()) 
+  userId         String           
+  user           User             @relation(fields: [userId], references: [id])
+  amount         Float           
+  currency       String           
+  status         PaymentStatus          
+  transactionId  String           
+  paymentMethod  String           
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt     
 }

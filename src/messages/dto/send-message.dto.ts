@@ -5,7 +5,7 @@ export class SendMessageDto {
     senderId: string
 
     @IsString()
-    matchId: string
+    recipientId: string
 
     @IsString()
     content: string

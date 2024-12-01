@@ -9,7 +9,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { MessagesModule } from './messages/messages.module';
 import { RedisService } from './redis.service';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-
+import { WebhookModule } from './webhook/webhook.module';
 @Module({
   imports: [
     AuthModule, 
@@ -18,7 +18,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     MatchesModule,
     ProfilesModule,
     MessagesModule,
-    SubscriptionsModule
+    SubscriptionsModule,
+    WebhookModule
   ],
   controllers: [],
   providers: [PrismaService, SendGridService, RedisService],

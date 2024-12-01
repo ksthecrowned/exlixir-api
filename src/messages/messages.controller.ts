@@ -12,13 +12,13 @@ import { validate } from "class-validator";
 @UseGuards(AuthGuard)
 export class MessagesController {
     constructor(
-        private readonly messagesService: MessagesService
+        private readonly messagesService: MessagesService,
+        private readonly prisma: PrismaService
     ) {}
 
     @Post("")
     async sendMessage(
         @Res() res: FastifyReply,
-        @Req() req: FastifyRequest,
         @Body() data: SendMessageDto
     ) {
         try {
@@ -26,21 +26,62 @@ export class MessagesController {
             if (errors.length > 0) {
                 throw new BadRequestException(errors);
             }
-            const response = await this.messagesService.send(data);
+            const response = await this.messagesService.sendMessage(data);
             return res.status(response.statusCode).send(response);
         } catch (error) {
             return res.status(500).send('Internal server error');
         }
     }
 
-    @Get("/:senderId/:matchId")
+    @Get("")
     async getChatHistory(
         @Res() res: FastifyReply,
         @Req() req: FastifyRequest,
-        @Param() data: { senderId: string, matchId: string }
     ) {
         try {
-            const response = await this.messagesService.getChatHistory(data.senderId, data.matchId);
+            const token = req.headers['authorization'].replace('Bearer ', '');
+            const tokenIsValid = await this.prisma.verificationToken.findFirst({
+                where: {
+                    token,
+                    expiresAt: {
+                        gt: new Date(),
+                    }
+                }
+            })
+            if(!tokenIsValid || !tokenIsValid.userId) {
+                return res.status(401).send('Unauthorized');
+            }
+
+            const userExists = await this.prisma.user.findUnique({
+                where: {
+                    id: tokenIsValid.userId,
+                    isVerified: true
+                }
+            })
+
+            if(!userExists) {
+                return res.status(400).send({
+                    statusCode: 400,
+                    message: "User not found or not verified"
+                })
+            }
+            
+            const response = await this.messagesService.getAllConversations(tokenIsValid.userId);
+            return res.status(response.statusCode).send(response);
+        } catch (error) {
+            return res.status(500).send('Internal server error');
+        }
+    }
+
+    @Get("/:senderId/:receiverId")
+    async getConversation(
+        @Res() res: FastifyReply,
+        @Req() req: FastifyRequest,
+        @Param('senderId') senderId: string,
+        @Param('receiverId') receiverId: string
+    ) {
+        try {
+            const response = await this.messagesService.getConversation(senderId, receiverId);
             return res.status(response.statusCode).send(response);
         } catch (error) {
             return res.status(500).send('Internal server error');

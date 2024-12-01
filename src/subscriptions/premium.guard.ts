@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { SubscriptionsService } from './subscriptions.service';
+import { SubscriptionService } from './subscriptions.service';
 
 @Injectable()
 export class PremiumGuard implements CanActivate {
-  constructor(private readonly subscriptionService: SubscriptionsService) {}
+  constructor(private readonly subscriptionService: SubscriptionService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
