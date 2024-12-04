@@ -1,16 +1,18 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
+import { addDays } from 'date-fns';
 import { PaymentService } from 'src/payments/payment.service';
-import { SubscriptionService } from 'src/subscriptions/subscriptions.service';
+import { PrismaService } from 'src/prisma.service';
 
 @Controller('webhook')
 export class WebhookController {
     constructor(
         private readonly paymentService: PaymentService,
-        private readonly subscriptionService: SubscriptionService
+        private readonly prisma: PrismaService
     ){}
 
     @Post('momo')
     async handlePaymentNotification(@Body() notification: { transactionId: string, status: string }) {
+        console.log(notification);
         const { transactionId, status } = notification;
       
         if (status === 'SUCCESSFUL') {
@@ -19,7 +21,15 @@ export class WebhookController {
         
             // 2. Activer la souscription
             const userId = await this.paymentService.getUserIdByTransactionId(transactionId);
-            await this.subscriptionService.activateSubscription(userId, 30);
+
+            const expiresAt = addDays(new Date(), 30);
+            await this.prisma.subscription.update({
+                where: { userId },
+                data: {
+                expiresAt,
+                active: true
+                },
+            });
         
             return { message: 'Subscription activated successfully' };
         } else {

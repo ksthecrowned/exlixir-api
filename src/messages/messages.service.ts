@@ -2,22 +2,24 @@ import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { RedisService } from "src/redis.service";
 import { SendMessageDto } from "./dto/send-message.dto";
-import { SubscriptionService } from "src/subscriptions/subscriptions.service";
+// import { SubscriptionService } from "src/subscriptions/subscriptions.service";
 
 @Injectable()
 export class MessagesService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly redisService: RedisService,
-        private readonly subscriptionService: SubscriptionService
+        // private readonly subscriptionService: SubscriptionService
     ) {}
 
     async sendMessage(data: SendMessageDto) {
         try {
-          const subscription = await this.subscriptionService.checkSubscriptionStatus(data.senderId);
+          const subscription = await this.prisma.subscription.findUnique({
+            where: { id: data.senderId },
+          });
       
           let matchId: string | null = null;
-          if (!subscription.isActive) {
+          if (!subscription.active) {
             const match = await this.prisma.match.findFirst({
               where: {
                 OR: [

@@ -1,46 +1,77 @@
 import { Injectable } from '@nestjs/common';
 import { addDays } from 'date-fns';
+import { MomoService } from 'src/momo/momo.service';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class SubscriptionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly momoService: MomoService
+  ) {}
 
-  async createOrUpdateSubscription(userId: string, durationInDays: number, type: 'PREMIUM' | 'PREMIUM_PLUS') {
+  async createOrUpdateSubscription(
+    userId: string,
+    type: 'PREMIUM' | 'PREMIUM_PLUS',
+    phoneNumber: string,
+    amount: number,
+    currency: string = 'XAF',
+  ) {
     try {
-      const expiresAt = addDays(new Date(), durationInDays);
-
+      // Étape 1 : Initier une demande de paiement via MomoService
+      const paymentResponse = await this.momoService.requestPayment(amount, currency, phoneNumber);
+  
+      if (paymentResponse.status !== 202) {
+        throw new Error('Payment initiation failed');
+      }
+  
+      const transactionId = paymentResponse.transactionId;
+  
+      // Étape 2 : Enregistrer le paiement dans la table "Payment"
+      const payment = await this.prisma.payment.create({
+        data: {
+          userId,
+          transactionId,
+          amount,
+          currency,
+          status: 'PENDING',
+          paymentMethod: 'MOMO',
+        },
+      });
+  
+      // Étape 5 : Créer ou mettre à jour l'abonnement
       const subscription = await this.prisma.subscription.upsert({
         where: { userId },
         create: {
           userId,
           type,
-          expiresAt,
+          active: false
         },
         update: {
           type,
-          expiresAt,
+          active: false
         },
       });
-
+  
       return {
         statusCode: 200,
         message: 'Subscription updated successfully',
         subscription,
+        payment
       };
     } catch (error) {
       throw error;
     }
-  }
+  }  
 
   async activateSubscription(userId: string, durationInDays: number) {
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + durationInDays);
+    const expiresAt = addDays(new Date(), durationInDays);
   
     return await this.prisma.subscription.update({
       where: { userId },
       data: {
-        expiresAt: expirationDate,
+        expiresAt,
+        active: true
       },
     });
   }

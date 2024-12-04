@@ -55,9 +55,17 @@ export class SubscriptionsController {
             if (errors.length > 0) {
                 throw new BadRequestException(errors);
             }
-            const response = await this.subscriptionService.createOrUpdateSubscription(tokenIsValid.userId, data.durationInDays, data.type);
+            
+            const response = await this.subscriptionService.createOrUpdateSubscription(
+                tokenIsValid.userId,
+                data.type,
+                data.phoneNumber,
+                data.amount,
+                data.currency
+            );
             return res.status(response.statusCode).send(response);
         } catch (error) {
+            console.log(error);
             return res.status(500).send('Internal server error');
         }
     }

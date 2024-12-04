@@ -10,6 +10,8 @@ import { MessagesModule } from './messages/messages.module';
 import { RedisService } from './redis.service';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { WebhookModule } from './webhook/webhook.module';
+import { MomoModule } from './momo/momo.module';
+
 @Module({
   imports: [
     AuthModule, 
@@ -19,9 +21,14 @@ import { WebhookModule } from './webhook/webhook.module';
     ProfilesModule,
     MessagesModule,
     SubscriptionsModule,
-    WebhookModule
+    WebhookModule,
+    MomoModule
   ],
   controllers: [],
-  providers: [PrismaService, SendGridService, RedisService],
+  providers: [
+    PrismaService, 
+    SendGridService, 
+    RedisService,
+  ],
 })
 export class AppModule {}

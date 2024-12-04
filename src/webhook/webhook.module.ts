@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { PaymentService } from "src/payments/payment.service";
 import { PrismaService } from "src/prisma.service";
-import { SubscriptionService } from "src/subscriptions/subscriptions.service";
+import { WebhookController } from "./webhook.controller";
 
 @Module({
-    controllers: [],
-    providers: [PaymentService, SubscriptionService, PrismaService],
+    controllers: [WebhookController],
+    providers: [PaymentService, PrismaService],
     exports: []
 })
 export class WebhookModule {}
